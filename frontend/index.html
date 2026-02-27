@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LAN Media Viewer</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 2rem; background: #f8fafc; color: #0f172a; }
+      .card { max-width: 720px; margin: 0 auto; background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08); }
+      button { padding: 0.6rem 1rem; border: none; border-radius: 8px; background: #2563eb; color: white; cursor: pointer; }
+      button:disabled { background: #94a3b8; cursor: not-allowed; }
+      .muted { color: #475569; font-size: 0.95rem; }
+      .result { margin-top: 1rem; padding: 0.8rem; background: #f1f5f9; border-radius: 8px; word-break: break-all; }
+      .error { color: #b91c1c; margin-top: 0.7rem; }
+      input[type=file] { margin-bottom: 1rem; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>LAN Media Viewer</h1>
+      <p class="muted">Выберите фото или видео, получите временную ссылку и откройте её на ТВ/телефоне в той же Wi‑Fi сети.</p>
+
+      <input id="mediaInput" type="file" accept="image/*,video/*" />
+      <div>
+        <button id="uploadBtn">Загрузить и получить ссылку</button>
+      </div>
+
+      <div class="result" id="configInfo">Загрузка конфигурации...</div>
+      <div class="result" id="resultBox" style="display:none;"></div>
+      <div class="error" id="errorBox" style="display:none;"></div>
+    </div>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
