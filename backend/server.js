@@ -9,7 +9,7 @@ const crypto = require('crypto');
 const mime = require('mime-types');
 
 const app = express();
-const PORT = Number(process.env.PORT || 3000);
+const BASE_PORT = Number(process.env.PORT || 3000);
 const ROOT_DIR = path.join(__dirname, '..');
 const STORAGE_DIR = path.join(ROOT_DIR, 'storage');
 const FRONTEND_DIR = path.join(ROOT_DIR, 'frontend');
@@ -18,6 +18,7 @@ const CLEANUP_INTERVAL_MS = Number(process.env.CLEANUP_INTERVAL_MS || 60 * 60 * 
 const MAX_FILE_SIZE_BYTES = Number(process.env.MAX_FILE_SIZE_BYTES || 500 * 1024 * 1024);
 
 const mediaStore = new Map();
+let activePort = BASE_PORT;
 
 function ensureStorageDir() {
   if (!fs.existsSync(STORAGE_DIR)) {
@@ -126,7 +127,7 @@ app.use(express.static(FRONTEND_DIR));
 app.get('/api/config', (_req, res) => {
   res.json({
     lanIp: getLanIp(),
-    port: PORT,
+    port: activePort,
     ttlMs: TTL_MS,
     maxFileSizeBytes: MAX_FILE_SIZE_BYTES
   });
@@ -182,7 +183,7 @@ app.get('/api/share/:id', (req, res) => {
   }
 
   const lanIp = getLanIp();
-  const url = `http://${lanIp}:${PORT}/view/${id}?token=${encodeURIComponent(media.secret)}`;
+  const url = `http://${lanIp}:${activePort}/view/${id}?token=${encodeURIComponent(media.secret)}`;
 
   res.json({
     url,
@@ -271,8 +272,24 @@ app.get('/media/:id', async (req, res) => {
 
 setInterval(cleanupExpired, CLEANUP_INTERVAL_MS).unref();
 
-app.listen(PORT, '0.0.0.0', () => {
-  const lanIp = getLanIp();
-  console.log(`LAN Media Viewer backend running on http://0.0.0.0:${PORT}`);
-  console.log(`LAN access URL: http://${lanIp}:${PORT}`);
-});
+function startServer(port, attemptsLeft = 20) {
+  const server = app.listen(port, '0.0.0.0', () => {
+    activePort = port;
+    const lanIp = getLanIp();
+    console.log(`LAN Media Viewer backend running on http://0.0.0.0:${activePort}`);
+    console.log(`LAN access URL: http://${lanIp}:${activePort}`);
+  });
+
+  server.on('error', (err) => {
+    if (err && err.code === 'EADDRINUSE' && attemptsLeft > 0) {
+      console.warn(`Port ${port} is busy, trying ${port + 1}...`);
+      startServer(port + 1, attemptsLeft - 1);
+      return;
+    }
+
+    console.error('Failed to start server:', err.message);
+    process.exit(1);
+  });
+}
+
+startServer(BASE_PORT);
