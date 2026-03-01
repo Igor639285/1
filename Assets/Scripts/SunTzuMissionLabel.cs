@@ -2,9 +2,22 @@ using UnityEngine;
 
 public class SunTzuMissionLabel : MonoBehaviour
 {
+    [SerializeField] private SunTzuCampaignDirector director;
+
     private void Start()
     {
-        Debug.Log("Цель сцены: тактическая шахматная игра по мотивам 'Искусства войны' Сунь-цзы.");
-        Debug.Log("Ключевая идея: побеждает не сила фигур, а контроль пространства и предсказание замыслов противника.");
+        if (director == null)
+        {
+            director = FindObjectOfType<SunTzuCampaignDirector>();
+        }
+
+        Debug.Log("Сюжет: Сунь У отправлен сдерживать врага до прибытия союзных войск.");
+        Debug.Log("Угроза: враг проник в состав чиновников, его необходимо выявить.");
+
+        if (director != null && director.CurrentChapter != null)
+        {
+            Debug.Log($"Активная глава: {director.CurrentChapter.title}");
+            Debug.Log($"Ключевая задача: {director.CurrentChapter.objective}");
+        }
     }
 }
