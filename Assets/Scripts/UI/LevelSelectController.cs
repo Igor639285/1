@@ -29,8 +29,18 @@ public class LevelSelectController : MonoBehaviour
 
     private void RefreshView()
     {
+        if (levelRenderers == null)
+        {
+            return;
+        }
+
         for (int i = 0; i < levelRenderers.Length; i++)
         {
+            if (levelRenderers[i] == null)
+            {
+                continue;
+            }
+
             int level = i + 1;
             bool unlocked = GameProgress.IsLevelUnlocked(level);
             levelRenderers[i].material.color = unlocked ? new Color(0.2f, 0.7f, 0.25f) : new Color(0.35f, 0.35f, 0.35f);

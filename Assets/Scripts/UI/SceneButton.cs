@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SceneButton : MonoBehaviour
 {
@@ -14,8 +15,22 @@ public class SceneButton : MonoBehaviour
     [SerializeField] private int levelIndex = 1;
     [SerializeField] private MainMenuController mainMenu;
     [SerializeField] private LevelSelectController levelSelect;
+    [SerializeField] private Button uiButton;
+
+    private void Awake()
+    {
+        if (uiButton != null)
+        {
+            uiButton.onClick.AddListener(HandleAction);
+        }
+    }
 
     private void OnMouseDown()
+    {
+        HandleAction();
+    }
+
+    private void HandleAction()
     {
         switch (actionType)
         {

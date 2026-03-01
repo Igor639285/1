@@ -4,9 +4,24 @@ using UnityEngine.SceneManagement;
 public class MissionController : MonoBehaviour
 {
     [SerializeField] private int levelIndex = 1;
+    [SerializeField] private float endDelay = 1.5f;
+
+    private bool finishing;
+    private float timer;
 
     private void Update()
     {
+        if (finishing)
+        {
+            timer -= Time.deltaTime;
+            if (timer <= 0f)
+            {
+                SceneManager.LoadScene("LevelSelect");
+            }
+
+            return;
+        }
+
         bool enemiesAlive = HasAlive(Combatant.Faction.Enemy);
         bool alliesAlive = HasAlive(Combatant.Faction.Player) || HasAlive(Combatant.Faction.Ally);
 
@@ -14,16 +29,16 @@ public class MissionController : MonoBehaviour
         {
             GameProgress.UnlockNextLevel(levelIndex);
             Debug.Log("Победа! Следующий уровень разблокирован.");
-            SceneManager.LoadScene("LevelSelect");
-            enabled = false;
+            finishing = true;
+            timer = endDelay;
             return;
         }
 
         if (!alliesAlive)
         {
             Debug.Log("Поражение! Все ваши силы уничтожены.");
-            SceneManager.LoadScene("LevelSelect");
-            enabled = false;
+            finishing = true;
+            timer = endDelay;
         }
     }
 
