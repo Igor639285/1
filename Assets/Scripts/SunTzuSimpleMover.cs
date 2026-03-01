@@ -1,11 +1,24 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Combatant))]
 public class SunTzuSimpleMover : MonoBehaviour
 {
-    public float Speed { get; set; } = 5f;
+    [SerializeField] private float speed = 5f;
+
+    private Combatant combatant;
+
+    private void Awake()
+    {
+        combatant = GetComponent<Combatant>();
+    }
 
     private void Update()
     {
+        if (!combatant.IsAlive)
+        {
+            return;
+        }
+
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
 
@@ -15,7 +28,7 @@ public class SunTzuSimpleMover : MonoBehaviour
             direction.Normalize();
         }
 
-        transform.position += direction * Speed * Time.deltaTime;
+        transform.position += direction * speed * Time.deltaTime;
 
         if (direction.sqrMagnitude > 0.001f)
         {
